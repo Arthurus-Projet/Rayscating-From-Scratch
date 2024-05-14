@@ -4,12 +4,9 @@
 
 
 double degToRad(double degree) {
-    // Si l'angle est égal à zéro, le résultat est également zéro
     if (degree == 0.0) {
         return 0.0;
-    }
-    // Sinon, convertir les degrés en radians en utilisant la formule : radians = (degrés * PI) / 180
-    else {
+    } else {
         return (degree * M_PI) / 180.0;
     }
 }
@@ -24,20 +21,4 @@ double modulo(double numerateur, double denominateur) {
     return fmod(numerateur, denominateur);
 }
 
-/*double modulo(double dividend, double divisor) {
-    if (divisor == 0) {
-        // Gérer le cas où le diviseur est zéro
-        std::cerr << "Erreur : Division par zéro !" << std::endl;
-        return 0; // Ou tout autre traitement souhaité
-    }
-    
-    int quotient = dividend / divisor;
-    int remainder = dividend - quotient * divisor;
-    
-    if (remainder < 0) {
-        // Ajouter le diviseur au reste si le reste est négatif
-        remainder += divisor;
-    }
-    
-    return remainder;
-}*/
+
