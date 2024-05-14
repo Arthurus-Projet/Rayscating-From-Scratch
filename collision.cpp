@@ -4,23 +4,9 @@
 #include "Headers/MathFunctions.h"
 #include "Headers/Collision.h"
 
-int map[13][13] = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-};
 
-std::pair<double, double> collision_0_90(double x, double y, double angle) {
+
+std::pair<double, double> collision_0_90(double x, double y, double angle, int map[13][13]) {
     
 
     // Horizontal wall
@@ -133,8 +119,9 @@ std::pair<double, double> collision_0_90(double x, double y, double angle) {
       return return_2;
     }
 
-std::pair<double, double> collision_90_180(double x, double y, double angle) {
+std::pair<double, double> collision_90_180(double x, double y, double angle, int map[13][13]) {
 
+  
     double vertical_angle = 90.0 - (angle - 90.0);
 
     // Horizontal wall
@@ -239,10 +226,13 @@ std::pair<double, double> collision_90_180(double x, double y, double angle) {
         return return_1;
       else
         return return_2;
-}
+    }
 
 
-std::pair<double, double> collision_270_360(double x, double y, double angle) {
+
+std::pair<double, double> collision_270_360(double x, double y, double angle, int map[13][13]) {
+
+    
 
     double vertical_angle = 90.0 - modulo(angle, 90.0);
     double horizontal_angle = modulo(angle, 270);
@@ -342,9 +332,9 @@ std::pair<double, double> collision_270_360(double x, double y, double angle) {
         return return_1;
       else
         return return_2;
-}
+    }
 
-std::pair<double, double> collision_180_270(double x, double y, double angle) {
+std::pair<double, double> collision_180_270(double x, double y, double angle, int map[13][13]) {
 
     double vertical_angle = modulo(angle, 180.0);
     double horizontal_angle = 90.0 - modulo(angle, 180.0);
@@ -459,4 +449,4 @@ std::pair<double, double> collision_180_270(double x, double y, double angle) {
         return return_1;
       else
         return return_2;
-}
+    }

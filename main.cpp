@@ -12,10 +12,26 @@ double rayon;
 double size = 4;
 double windowHeight = 800;
 
+
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(windowHeight, windowHeight), "SFML Raycasting");
 
-
+    int map[13][13] = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
+        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    };
     
     while (window.isOpen()) {
         sf::Event event;
@@ -32,13 +48,13 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             // to move backwards
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             referenceAngle--;
             if (referenceAngle == -1)
                 referenceAngle = 359;
             
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
             referenceAngle++;
             if (referenceAngle == 360)
                 referenceAngle = 0;
@@ -52,19 +68,19 @@ int main() {
 
             if (0.0 <= rayon == true && rayon < 90.0 == true) {
                 degToRad(3.9);
-                pos = collision_0_90(4.4, 6.2, rayon);
+                pos = collision_0_90(4.4, 6.2, rayon, map);
             }
 
             if (90 <= rayon == true && rayon < 180 == true) {
-                pos = collision_90_180(4.4, 6.2, rayon);
+                pos = collision_90_180(4.4, 6.2, rayon, map);
             }
 
             if (270 < rayon == true && rayon < 360 == true) {
-                pos = collision_270_360(4.4, 6.2, rayon);
+                pos = collision_270_360(4.4, 6.2, rayon, map);
             }
 
             if (180 <= rayon == true && rayon <= 270 == true) {
-                pos = collision_180_270(4.4, 6.2, rayon);
+                pos = collision_180_270(4.4, 6.2, rayon, map);
             }
 
             double sideX = 4.4 - pos.first;
@@ -79,13 +95,10 @@ int main() {
  
             double yWall = ((windowHeight - distance) / 2);
 
-            // Création d'un rectangle
             sf::RectangleShape rectangle;
             rectangle.setSize(sf::Vector2f(size, distance));
             rectangle.setPosition(i * size, yWall);
             rectangle.setFillColor(sf::Color::Green);
-
-            // Dessiner le rectangle
             window.draw(rectangle);
             i++;
         }
