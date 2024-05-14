@@ -4,10 +4,7 @@
 #include "Headers/MathFunctions.h"
 #include "Headers/Collision.h"
 
-
-
-std::pair<double, double> collision_0_90(double x, double y, double angle) {
-    int map[13][13] = {
+int map[13][13] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
@@ -21,7 +18,10 @@ std::pair<double, double> collision_0_90(double x, double y, double angle) {
         {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    };
+};
+
+std::pair<double, double> collision_0_90(double x, double y, double angle) {
+    
 
     // Horizontal wall
     double adj = modulo(y, 1.0); // Keeps only the decimal part
@@ -135,21 +135,6 @@ std::pair<double, double> collision_0_90(double x, double y, double angle) {
 
 std::pair<double, double> collision_90_180(double x, double y, double angle) {
 
-  int map[13][13] = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    };
     double vertical_angle = 90.0 - (angle - 90.0);
 
     // Horizontal wall
@@ -254,146 +239,112 @@ std::pair<double, double> collision_90_180(double x, double y, double angle) {
         return return_1;
       else
         return return_2;
+}
+
+
+std::pair<double, double> collision_270_360(double x, double y, double angle) {
+
+    double vertical_angle = 90.0 - modulo(angle, 90.0);
+    double horizontal_angle = modulo(angle, 270);
+
+    // Horizontal wall
+    double adj = 1 - modulo(y, 1);
+    double opp = adj * std::tan(degToRad(horizontal_angle));
+
+    // vertical wall
+    double adj2 = 1.0 - modulo(x, 1);
+    double opp2 = std::tan(degToRad(vertical_angle)) * adj2;
+
+
+    int x_test = std::floor(x + opp);
+    int y_test = round_(y + adj);
+
+    bool bool_horizontal = false;
+    bool bool_vertical = false;
+
+    std::pair<double, double> return_1;
+    std::pair<double, double> return_2;
+
+    try {
+        // We test the first horizontal wall
+        if (map[y_test][x_test] != 0) {
+            return_1 = std::make_pair(x + opp, y + adj);
+            bool_horizontal = true;
+        }
+    } catch(...) {
     }
 
 
-    std::pair<double, double> collision_270_360(double x, double y, double angle) {
+    x_test = round_(x + adj2);
+    y_test = std::floor(y + opp2);
 
-      int map[13][13] = {
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-            {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-            {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-        };
+    try {
+        // We check the first vertical wall
+        if (map[y_test][x_test] != 0) {
+            return_2 = std::make_pair(x + adj2, y + opp2);
+            bool_vertical = true;
+        }
+    } catch(...) {
+    }
 
 
-        double vertical_angle = 90.0 - modulo(angle, 90.0);
-        double horizontal_angle = modulo(angle, 270);
-
-        // Horizontal wall
-        double adj = 1 - modulo(y, 1);
-        double opp = adj * std::tan(degToRad(horizontal_angle));
-
-        // vertical wall
-        double adj2 = 1.0 - modulo(x, 1);
-        double opp2 = std::tan(degToRad(vertical_angle)) * adj2;
+    if (bool_horizontal && bool_vertical) {
+        if (return_1.first < return_2.first)
+            return return_1;
+        return return_2;
+    }
 
 
-        int x_test = std::floor(x + opp);
-        int y_test = round_(y + adj);
+    // We test all horizontal Walls
+    double opp_up = std::tan(degToRad(horizontal_angle));
+    int index = 1;
 
-        bool bool_horizontal = false;
-        bool bool_vertical = false;
-
-        std::pair<double, double> return_1;
-        std::pair<double, double> return_2;
-
-        try {
-            // We test the first horizontal wall
-            if (map[y_test][x_test] != 0) {
-                return_1 = std::make_pair(x + opp, y + adj);
-                bool_horizontal = true;
+    if (bool_horizontal == false) {
+        while (true) {
+            try {
+                if (map[static_cast<int>(round_(y + adj + index))][static_cast<int>(std::floor(x + opp + opp_up * index))] != 0) {
+                    return_1 = std::make_pair(x + opp + opp_up * index, std::floor(y + adj + index));
+                    break;
+                  }
+            } catch(...) {
+                return_1 = std::make_pair(3000.0, 3000.0);
+                break;
             }
-        } catch(...) {
+            index++;
         }
+    }
 
-
-        x_test = round_(x + adj2);
-        y_test = std::floor(y + opp2);
-
-        try {
-            // We check the first vertical wall
-            if (map[y_test][x_test] != 0) {
-                return_2 = std::make_pair(x + adj2, y + opp2);
-                bool_vertical = true;
-            }
-        } catch(...) {
-        }
-
-
-        if (bool_horizontal && bool_vertical) {
-            if (return_1.first < return_2.first)
-                return return_1;
-            return return_2;
-        }
-
-
-        // We test all horizontal Walls
-        double opp_up = std::tan(degToRad(horizontal_angle));
-        int index = 1;
-
-        if (bool_horizontal == false) {
-            while (true) {
-                try {
-                    if (map[static_cast<int>(round_(y + adj + index))][static_cast<int>(std::floor(x + opp + opp_up * index))] != 0) {
-                        return_1 = std::make_pair(x + opp + opp_up * index, std::floor(y + adj + index));
-                        break;
-                      }
-                } catch(...) {
-                    return_1 = std::make_pair(3000.0, 3000.0);
+    // We check all the vertical wall
+    double opp_right = std::tan(degToRad(vertical_angle));
+    index = 1;
+    if (!bool_vertical){
+        while (true) {
+            int y_ = std::floor(y + opp2 + opp_right * index);
+            int x_ = round_(x + adj2) + index;
+            try {
+                if (map[y_ ][x_] != 0) {
+                    return_2 = std::make_pair(x + adj2 + static_cast<double>(index), y + opp2 + opp_right * static_cast<double>(index));
                     break;
                 }
-                index++;
+            } catch(...) {
+                return_2 = std::make_pair(3000.0, 3000.0);
+                break;
             }
+            index++;
         }
+    }
 
-        // We check all the vertical wall
-        double opp_right = std::tan(degToRad(vertical_angle));
-        index = 1;
-        if (!bool_vertical){
-            while (true) {
-                int y_ = std::floor(y + opp2 + opp_right * index);
-                int x_ = round_(x + adj2) + index;
-                try {
-                    if (map[y_ ][x_] != 0) {
-                        return_2 = std::make_pair(x + adj2 + static_cast<double>(index), y + opp2 + opp_right * static_cast<double>(index));
-                        break;
-                    }
-                } catch(...) {
-                    return_2 = std::make_pair(3000.0, 3000.0);
-                    break;
-                }
-                index++;
-            }
-        }
-
-          if (return_1.first == 3000.0)
-            return return_2;
-          if (return_2.first == 3000.0)
-            return return_1;
-          if (return_1.first < return_2.first)
-            return return_1;
-          else
-            return return_2;
-        }
+      if (return_1.first == 3000.0)
+        return return_2;
+      if (return_2.first == 3000.0)
+        return return_1;
+      if (return_1.first < return_2.first)
+        return return_1;
+      else
+        return return_2;
+}
 
 std::pair<double, double> collision_180_270(double x, double y, double angle) {
-
-    int map[13][13] = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    };
-
 
     double vertical_angle = modulo(angle, 180.0);
     double horizontal_angle = 90.0 - modulo(angle, 180.0);
@@ -508,4 +459,4 @@ std::pair<double, double> collision_180_270(double x, double y, double angle) {
         return return_1;
       else
         return return_2;
-    }
+}
