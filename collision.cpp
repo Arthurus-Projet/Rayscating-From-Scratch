@@ -3,11 +3,22 @@
 #include <cmath>
 #include "Headers/MathFunctions.h"
 #include "Headers/Collision.h"
+#include "Headers/Player.h"
 
 
+Collision::Collision() {
+    // Initialisation par défaut ou vide
+}
 
-std::pair<double, double> collision_0_90(double x, double y, double angle, int map[13][13]) {
-    
+Collision::Collision(Player player)
+    : player(player) {}
+
+
+std::pair<double, double> Collision::collision_0_90(int map[13][13]) const {
+    double x = player.getX();
+    double y = player.getY();
+    double angle = player.getAngle();
+    std::cout << "DATA " <<x << y << angle << std::endl;
 
     // Horizontal wall
     double adj = modulo(y, 1.0); // Keeps only the decimal part
@@ -44,9 +55,11 @@ std::pair<double, double> collision_0_90(double x, double y, double angle, int m
 
     try{
         // We check the first vertical wall
-        if (map[y_test][x_test] != 0) {
-            return_2 = std::make_pair(x + adj2, y - opp2);
-            bool_vertical = true;
+        if (y_test >= 0 && x_test >= 0) {
+            if (map[y_test][x_test] != 0) {
+                return_2 = std::make_pair(x + adj2, y - opp2);
+                bool_vertical = true;
+            }
         }
     } catch(...) {
     }
@@ -59,7 +72,7 @@ std::pair<double, double> collision_0_90(double x, double y, double angle, int m
 
 
     // We test all horizontal Walls
-    double opp_up = std::tan(degToRad(90.0 - angle));
+    double opp_up = std::tan(degToRad(90.0 -angle));
     int index = 1;
 
     if (!bool_horizontal) {
@@ -94,10 +107,15 @@ std::pair<double, double> collision_0_90(double x, double y, double angle, int m
             int y_ = std::floor(y - opp2 - opp_right * index);
             int x_ = (round(x + adj2) + index);
             try {
-                if (map[static_cast<int>(y_)][static_cast<int>(x_)] != 0) {
-                    double return_x_2 = (x + adj2 + static_cast<double>(index));
-                    double return_y_2 = (y - opp2 - opp_right * static_cast<double>(index));
-                    return_2 = std::make_pair(return_x_2, return_y_2);
+                if (y_ >= 0 && x_ >= 0) {
+                    if (map[static_cast<int>(y_)][static_cast<int>(x_)] != 0) {
+                        double return_x_2 = (x + adj2 + static_cast<double>(index));
+                        double return_y_2 = (y - opp2 - opp_right * static_cast<double>(index));
+                        return_2 = std::make_pair(return_x_2, return_y_2);
+                        break;
+                    }
+                } else {
+                    return_2 = std::make_pair(3000.0, 3000.0);
                     break;
                 }
             } catch (...) {
@@ -119,14 +137,16 @@ std::pair<double, double> collision_0_90(double x, double y, double angle, int m
       return return_2;
     }
 
-std::pair<double, double> collision_90_180(double x, double y, double angle, int map[13][13]) {
-
+std::pair<double, double> Collision::collision_90_180(int map[13][13]) const {
+    double x = player.getX();
+    double y = player.getY();
+    double angle = player.getAngle();
   
     double vertical_angle = 90.0 - (angle - 90.0);
 
     // Horizontal wall
     double adj = modulo(y, 1);
-    double opp = adj * std::tan(degToRad(90.0 - angle));
+    double opp = adj * std::tan(degToRad(90.0 -angle));
 
     // vertical wall
     double adj2 = modulo(x, 1);
@@ -230,9 +250,11 @@ std::pair<double, double> collision_90_180(double x, double y, double angle, int
 
 
 
-std::pair<double, double> collision_270_360(double x, double y, double angle, int map[13][13]) {
+std::pair<double, double> Collision::collision_270_360(int map[13][13]) const {
 
-    
+    double x = player.getX();
+    double y = player.getY();
+    double angle = player.getAngle();
 
     double vertical_angle = 90.0 - modulo(angle, 90.0);
     double horizontal_angle = modulo(angle, 270);
@@ -257,9 +279,11 @@ std::pair<double, double> collision_270_360(double x, double y, double angle, in
 
     try {
         // We test the first horizontal wall
-        if (map[y_test][x_test] != 0) {
-            return_1 = std::make_pair(x + opp, y + adj);
-            bool_horizontal = true;
+        if (y_test >= 0 && x_test >= 0) {
+            if (map[y_test][x_test] != 0) {
+                return_1 = std::make_pair(x + opp, y + adj);
+                bool_horizontal = true;
+            }
         }
     } catch(...) {
     }
@@ -270,9 +294,11 @@ std::pair<double, double> collision_270_360(double x, double y, double angle, in
 
     try {
         // We check the first vertical wall
-        if (map[y_test][x_test] != 0) {
-            return_2 = std::make_pair(x + adj2, y + opp2);
-            bool_vertical = true;
+        if (y_test >= 0 && x_test >= 0) {
+            if (map[y_test][x_test] != 0) {
+                return_2 = std::make_pair(x + adj2, y + opp2);
+                bool_vertical = true;
+            }
         }
     } catch(...) {
     }
@@ -292,10 +318,15 @@ std::pair<double, double> collision_270_360(double x, double y, double angle, in
     if (bool_horizontal == false) {
         while (true) {
             try {
-                if (map[static_cast<int>(round_(y + adj + index))][static_cast<int>(std::floor(x + opp + opp_up * index))] != 0) {
-                    return_1 = std::make_pair(x + opp + opp_up * index, std::floor(y + adj + index));
-                    break;
-                  }
+                if (round_(y + adj + index) >= 0 && round_(y + adj + index) < 20 && std::floor(x + opp + opp_up * index) >= 0 && std::floor(x + opp + opp_up * index) < 20) {
+                    if (map[static_cast<int>(round_(y + adj + index))][static_cast<int>(std::floor(x + opp + opp_up * index))] != 0) {
+                        return_1 = std::make_pair(x + opp + opp_up * index, std::floor(y + adj + index));
+                        break;
+                    }
+                } else {
+                    return_1 = std::make_pair(3000.0, 3000.0);
+                break;
+                }
             } catch(...) {
                 return_1 = std::make_pair(3000.0, 3000.0);
                 break;
@@ -312,10 +343,15 @@ std::pair<double, double> collision_270_360(double x, double y, double angle, in
             int y_ = std::floor(y + opp2 + opp_right * index);
             int x_ = round_(x + adj2) + index;
             try {
-                if (map[y_ ][x_] != 0) {
-                    return_2 = std::make_pair(x + adj2 + static_cast<double>(index), y + opp2 + opp_right * static_cast<double>(index));
-                    break;
-                }
+                if (y_ >= 0 && x_ >= 0) {
+                    if (map[y_ ][x_] != 0) {
+                        return_2 = std::make_pair(x + adj2 + static_cast<double>(index), y + opp2 + opp_right * static_cast<double>(index));
+                        break;
+                    }
+            } else {
+                return_2 = std::make_pair(3000.0, 3000.0);
+                break;
+            }
             } catch(...) {
                 return_2 = std::make_pair(3000.0, 3000.0);
                 break;
@@ -334,8 +370,11 @@ std::pair<double, double> collision_270_360(double x, double y, double angle, in
         return return_2;
     }
 
-std::pair<double, double> collision_180_270(double x, double y, double angle, int map[13][13]) {
-
+std::pair<double, double> Collision::collision_180_270(int map[13][13]) const {
+    double x = player.getX();
+    double y = player.getY();
+    double angle = player.getAngle();
+    
     double vertical_angle = modulo(angle, 180.0);
     double horizontal_angle = 90.0 - modulo(angle, 180.0);
 
@@ -450,3 +489,5 @@ std::pair<double, double> collision_180_270(double x, double y, double angle, in
       else
         return return_2;
     }
+
+

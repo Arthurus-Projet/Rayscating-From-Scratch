@@ -3,19 +3,26 @@
 #include <cmath>
 #include "Headers/MathFunctions.h"
 #include "Headers/Collision.h"
-
-double playerX = 4.4;
-double playerY = 6.2;
-int referenceAngle = 90;
-int r;
-double rayon;
-double size = 4;
-double windowHeight = 800;
-
+#include "Headers/Player.h"
 
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(windowHeight, windowHeight), "SFML Raycasting");
+
+    double playerX = 4.4;
+    double playerY = 6.2;
+    int referenceAngle = 90;
+    int r;
+    double rayon;
+    double size = 4;
+    double windowHeight = 800;
+    double windowWidth = 500;
+    double speed = 3;
+    int angle = 90;
+    double health = 10;
+    Player player = Player(playerX, playerY, speed, angle, health);
+    Collision collision = Collision(player);
+    
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML Raycasting");
 
     int map[13][13] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -65,22 +72,23 @@ int main() {
         for(r = referenceAngle + 30.0; r >= referenceAngle -31.0; r-= 1.0) {
             rayon = modulo(r, 360);
             std::pair<double, double> pos;
+            collision.player.setAngle(rayon);
 
             if (0.0 <= rayon == true && rayon < 90.0 == true) {
-                degToRad(3.9);
-                pos = collision_0_90(4.4, 6.2, rayon, map);
+                pos = collision.collision_0_90(map);
+                std::cout << pos.first << std::endl;
             }
 
             if (90 <= rayon == true && rayon < 180 == true) {
-                pos = collision_90_180(4.4, 6.2, rayon, map);
+                pos = collision.collision_90_180(map);
             }
 
             if (270 < rayon == true && rayon < 360 == true) {
-                pos = collision_270_360(4.4, 6.2, rayon, map);
+                pos = collision.collision_270_360(map);
             }
 
             if (180 <= rayon == true && rayon <= 270 == true) {
-                pos = collision_180_270(4.4, 6.2, rayon, map);
+                pos = collision.collision_180_270(map);
             }
 
             double sideX = 4.4 - pos.first;
@@ -101,6 +109,7 @@ int main() {
             rectangle.setFillColor(sf::Color::Green);
             window.draw(rectangle);
             i++;
+
         }
 
         
