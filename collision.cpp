@@ -14,11 +14,9 @@ Collision::Collision(Player player)
     : player(player) {}
 
 
-std::pair<double, double> Collision::collision_0_90(int map[13][13]) const {
+std::pair<double, double> Collision::collision_0_90(int map[13][13], double angle) const {
     double x = player.getX();
     double y = player.getY();
-    double angle = player.getAngle();
-    std::cout << "DATA " <<x << y << angle << std::endl;
 
     // Horizontal wall
     double adj = modulo(y, 1.0); // Keeps only the decimal part
@@ -137,10 +135,9 @@ std::pair<double, double> Collision::collision_0_90(int map[13][13]) const {
       return return_2;
     }
 
-std::pair<double, double> Collision::collision_90_180(int map[13][13]) const {
+std::pair<double, double> Collision::collision_90_180(int map[13][13], double angle) const {
     double x = player.getX();
     double y = player.getY();
-    double angle = player.getAngle();
   
     double vertical_angle = 90.0 - (angle - 90.0);
 
@@ -250,11 +247,10 @@ std::pair<double, double> Collision::collision_90_180(int map[13][13]) const {
 
 
 
-std::pair<double, double> Collision::collision_270_360(int map[13][13]) const {
+std::pair<double, double> Collision::collision_270_360(int map[13][13], double angle) const {
 
     double x = player.getX();
     double y = player.getY();
-    double angle = player.getAngle();
 
     double vertical_angle = 90.0 - modulo(angle, 90.0);
     double horizontal_angle = modulo(angle, 270);
@@ -370,10 +366,9 @@ std::pair<double, double> Collision::collision_270_360(int map[13][13]) const {
         return return_2;
     }
 
-std::pair<double, double> Collision::collision_180_270(int map[13][13]) const {
+std::pair<double, double> Collision::collision_180_270(int map[13][13], double angle) const {
     double x = player.getX();
     double y = player.getY();
-    double angle = player.getAngle();
     
     double vertical_angle = modulo(angle, 180.0);
     double horizontal_angle = 90.0 - modulo(angle, 180.0);
