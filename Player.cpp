@@ -1,15 +1,12 @@
-// player.cpp
-
 #include "Headers/Player.h"
 
-// Constructeur par défaut
+
 Player::Player() : x(0.0), y(0.0), speed(0.0), angle(0.0), health(100) {}
 
-// Constructeur surchargé
 Player::Player(double x, double y, double speed, double angle, int health)
     : x(x), y(y), speed(speed), angle(angle), health(health) {}
 
-// Méthodes pour accéder aux membres privés
+
 double Player::getX() const {
     return x;
 }
