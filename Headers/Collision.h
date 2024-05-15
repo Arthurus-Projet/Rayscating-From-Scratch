@@ -1,9 +1,22 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-std::pair<double, double> collision_0_90(double x, double y, double angle, int map[13][13]);
-std::pair<double, double> collision_90_180(double x, double y, double angle, int map[13][13]);
-std::pair<double, double> collision_270_360(double x, double y, double angle, int map[13][13]);
-std::pair<double, double> collision_180_270(double x, double y, double angle, int map[13][13]);
+#include "Player.h"
 
-#endif
+class Collision {
+public:
+    Player player;
+
+public:
+	Collision();
+
+	Collision(Player player);
+
+    std::pair<double, double> collision_0_90(int map[13][13]) const;
+	std::pair<double, double> collision_90_180(int map[13][13]) const;
+	std::pair<double, double> collision_270_360(int map[13][13]) const;
+	std::pair<double, double> collision_180_270(int map[13][13]) const;
+};
+
+#endif 
+
