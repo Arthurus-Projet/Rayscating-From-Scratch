@@ -15,7 +15,7 @@ int main() {
     double rayon;
     double size = 4;
     double windowHeight = 800;
-    double windowWidth = 500;
+    double windowWidth = 800;
     double speed = 0.01;
     int reference_angle = 90;
     double health = 10;
@@ -56,6 +56,9 @@ int main() {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             // to move backwards
+            collision.player.setX(collision.player.getX() - collision.player.getSpeed() * std::cos(degToRad(collision.player.getAngle())));
+            collision.player.setY(collision.player.getY() + collision.player.getSpeed() * std::sin(degToRad(collision.player.getAngle())));
+ 
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             collision.player.setAngle(collision.player.getAngle() - 1);
@@ -72,45 +75,47 @@ int main() {
         window.clear();
         int i = 0;
         for(r = collision.player.getAngle() + 30.0; r >= collision.player.getAngle() -31.0; r-= 1.0) {
-            rayon = modulo(r, 360);
-            std::pair<double, double> pos;
-            
+            for (double y = 0.5; y >= 0; y-=0.5){
+                rayon = modulo(r + y, 360);
+                std::pair<double, double> pos;
+                
 
-            if (0.0 <= rayon == true && rayon < 90.0 == true) {
-                pos = collision.collision_0_90(map, rayon);
+                if (0.0 <= rayon == true && rayon < 90.0 == true) {
+                    pos = collision.collision_0_90(map, rayon);
+                }
+
+                if (90 <= rayon == true && rayon < 180 == true) {
+                    pos = collision.collision_90_180(map, rayon);
+                }
+
+                if (270 < rayon == true && rayon < 360 == true) {
+                    pos = collision.collision_270_360(map, rayon);
+                }
+
+                if (180 <= rayon == true && rayon <= 270 == true) {
+                    pos = collision.collision_180_270(map, rayon);
+                }
+
+                double sideX = collision.player.getX() - pos.first;
+                double sideY = collision.player.getY() - pos.second;
+                double hyp = std::sqrt(sideX * sideX + sideY * sideY);
+
+                double differenceWithPlayer = std::abs(rayon - collision.player.getAngle());
+
+                // fish eye correction
+                double d = hyp * std::cos(degToRad(differenceWithPlayer));
+                double distance = (windowHeight * 0.7) / (d + 0.0000000001);
+     
+                double yWall = ((windowHeight - distance) / 2);
+
+                sf::RectangleShape rectangle;
+                rectangle.setSize(sf::Vector2f(size, distance));
+                rectangle.setPosition((i) * size, yWall);
+                rectangle.setFillColor(sf::Color::Green);
+                window.draw(rectangle);
+                i++;
+
             }
-
-            if (90 <= rayon == true && rayon < 180 == true) {
-                pos = collision.collision_90_180(map, rayon);
-            }
-
-            if (270 < rayon == true && rayon < 360 == true) {
-                pos = collision.collision_270_360(map, rayon);
-            }
-
-            if (180 <= rayon == true && rayon <= 270 == true) {
-                pos = collision.collision_180_270(map, rayon);
-            }
-
-            double sideX = collision.player.getX() - pos.first;
-            double sideY = collision.player.getY() - pos.second;
-            double hyp = std::sqrt(sideX * sideX + sideY * sideY);
-
-            double differenceWithPlayer = std::abs(rayon - collision.player.getAngle());
-
-            // fish eye correction
-            double d = hyp * std::cos(degToRad(differenceWithPlayer));
-            double distance = (windowHeight * 0.7) / (d + 0.0000000001);
- 
-            double yWall = ((windowHeight - distance) / 2);
-
-            sf::RectangleShape rectangle;
-            rectangle.setSize(sf::Vector2f(size, distance));
-            rectangle.setPosition(i * size, yWall);
-            rectangle.setFillColor(sf::Color::Green);
-            window.draw(rectangle);
-            i++;
-
         }
 
         
