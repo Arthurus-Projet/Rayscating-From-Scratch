@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <algorithm> 
 #include <cmath>
 #include "Headers/MathFunctions.h"
 #include "Headers/Collision.h"
@@ -15,14 +16,22 @@ int main() {
     double rayon;
     double size = 4;
     double windowHeight = 800;
-    double windowWidth = 800;
+    double windowWidth = 700;
     double speed = 0.01;
     int reference_angle = 90;
     double health = 10;
+    bool bool_line = true;
     Player player = Player(playerX, playerY, speed, reference_angle, health);
     Collision collision = Collision(player);
     
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML Raycasting");
+
+    sf::Texture texture;
+    if (!texture.loadFromFile("ressources/bric.png")) {
+        std::cerr << "Erreur lors du chargement de l'image" << std::endl;
+        return -1;
+    }
+
 
     int map[13][13] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -72,10 +81,22 @@ int main() {
                 collision.player.setAngle(0);
         }
 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
+            bool_line = true;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) {
+            bool_line = false;
+        }
+
         window.clear();
-        int i = 0;
+
+        
+        int i = -1;
+        
         for(r = collision.player.getAngle() + 30.0; r >= collision.player.getAngle() -31.0; r-= 1.0) {
             for (double y = 0.5; y >= 0; y-=0.5){
+                i++;
+
                 rayon = modulo(r + y, 360);
                 std::pair<double, double> pos;
                 
@@ -108,17 +129,43 @@ int main() {
      
                 double yWall = ((windowHeight - distance) / 2);
 
-                sf::RectangleShape rectangle;
-                rectangle.setSize(sf::Vector2f(size, distance));
-                rectangle.setPosition((i) * size, yWall);
-                rectangle.setFillColor(sf::Color::Green);
-                window.draw(rectangle);
-                i++;
+                // Obtenir les dimensions de l'image
+                sf::Vector2u textureSize = texture.getSize();
+                double rest;
+                if (modulo(pos.first, 1) == 0) {
+                    rest = modulo(pos.second, 1);
+                }
+                else {
+                    rest = modulo(pos.first, 1);
+                }
 
+                double startX = rest * textureSize.x;
+              
+
+                sf::IntRect textureRect(startX, 0, size, textureSize.y);
+
+                // create spirite
+                sf::Sprite sprite;
+                sprite.setTexture(texture);
+                sprite.setTextureRect(textureRect); 
+
+                long double scaleY = distance / textureSize.y;
+                sprite.setScale(1, scaleY);
+                sprite.setPosition(i * size, yWall);
+
+                window.draw(sprite);
+
+                if (bool_line) {
+                    sf::RectangleShape rectangle;
+                    rectangle.setSize(sf::Vector2f(size, distance));
+                    rectangle.setPosition(i * size, yWall);
+                    rectangle.setFillColor(sf::Color::Blue);
+                    window.draw(rectangle);
+                }
+                
             }
         }
-
-        
+    
         window.display();
     }
 
