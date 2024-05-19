@@ -16,7 +16,7 @@ int main() {
     double rayon;
     double size = 4;
     double windowHeight = 800;
-    double windowWidth = 700;
+    double windowWidth = 496;
     double speed = 0.01;
     int reference_angle = 90;
     double health = 10;
@@ -31,6 +31,18 @@ int main() {
         std::cerr << "Erreur lors du chargement de l'image" << std::endl;
         return -1;
     }
+
+
+    sf::Vector2f rectangleSize(windowWidth, windowHeight / 2.f);
+
+    sf::RectangleShape greyRectangle(rectangleSize);
+    greyRectangle.setFillColor(sf::Color(113, 113, 113)); // grey
+    greyRectangle.setPosition(0.f, windowHeight / 2.f); 
+
+    sf::RectangleShape redRectangle(rectangleSize);
+    redRectangle.setFillColor(sf::Color(97, 9, 0)); // red
+    redRectangle.setPosition(0.f, 0.f); 
+
 
 
     int map[13][13] = {
@@ -90,6 +102,8 @@ int main() {
 
         window.clear();
 
+        window.draw(greyRectangle);
+        window.draw(redRectangle);
         
         int i = -1;
         
@@ -159,13 +173,14 @@ int main() {
                     sf::RectangleShape rectangle;
                     rectangle.setSize(sf::Vector2f(size, distance));
                     rectangle.setPosition(i * size, yWall);
-                    rectangle.setFillColor(sf::Color::Blue);
+                    rectangle.setFillColor(sf::Color::White);
                     window.draw(rectangle);
                 }
                 
             }
         }
-    
+
+
         window.display();
     }
 
