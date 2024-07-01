@@ -11,7 +11,7 @@ int main() {
 
     double playerX = 4.4;
     double playerY = 6.2;
-    int referenceAngle = 90;
+    int referenceAngle = 0;
     int r;
     double rayon;
     double size = 4;
@@ -45,7 +45,7 @@ int main() {
 
 
 
-    int map[13][13] = {
+    int initial_map[13][13] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
@@ -60,6 +60,22 @@ int main() {
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
     };
+
+    // Allocation de mémoire pour le tableau dynamique
+    int rows = 13;
+    int cols = 13;
+
+    int** map = new int*[rows];
+    for (int i = 0; i < rows; i++) {
+        map[i] = new int[cols];
+    }
+
+    // Copie des valeurs du tableau statique vers le tableau dynamique
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            map[i][j] = initial_map[i][j];
+        }
+    }
     
     while (window.isOpen()) {
         sf::Event event;

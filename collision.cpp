@@ -14,7 +14,7 @@ Collision::Collision(Player player)
     : player(player) {}
 
 
-std::pair<double, double> Collision::collision_0_90(int map[13][13], double angle) const {
+std::pair<double, double> Collision::collision_0_90(int** map, double angle) const {
     double x = player.getX();
     double y = player.getY();
 
@@ -135,7 +135,7 @@ std::pair<double, double> Collision::collision_0_90(int map[13][13], double angl
       return return_2;
     }
 
-std::pair<double, double> Collision::collision_90_180(int map[13][13], double angle) const {
+std::pair<double, double> Collision::collision_90_180(int** map, double angle) const {
     double x = player.getX();
     double y = player.getY();
   
@@ -198,8 +198,16 @@ std::pair<double, double> Collision::collision_90_180(int map[13][13], double an
     if (bool_horizontal == false) {
         while (true) {
             try {
-                if (map[static_cast<int>(round_(y - adj -index - 1))][static_cast<int>(std::floor(x + opp + opp_up * index))] != 0) {
+                long x_ = static_cast<long>(round_(y - adj -index - 1));
+                long y_ = static_cast<long>(std::floor(x + opp + opp_up * index));
+                if (y_ >= 0 && x_ >= 0 && y_ <= 12 && x_ <= 12)
+                {
+                    if (map[x_][y_] != 0) {
                     return_1 = std::make_pair(x + opp + opp_up * index, std::floor(y - adj -index));
+                    break;
+                    }
+                } else {
+                    return_1 = std::make_pair(3000.0, 3000.0);
                     break;
                 }
             } catch(...) {
@@ -247,7 +255,7 @@ std::pair<double, double> Collision::collision_90_180(int map[13][13], double an
 
 
 
-std::pair<double, double> Collision::collision_270_360(int map[13][13], double angle) const {
+std::pair<double, double> Collision::collision_270_360(int** map, double angle) const {
 
     double x = player.getX();
     double y = player.getY();
@@ -314,7 +322,7 @@ std::pair<double, double> Collision::collision_270_360(int map[13][13], double a
     if (bool_horizontal == false) {
         while (true) {
             try {
-                if (round_(y + adj + index) >= 0 && round_(y + adj + index) < 20 && std::floor(x + opp + opp_up * index) >= 0 && std::floor(x + opp + opp_up * index) < 20) {
+                if (round_(y + adj + index) >= 0 && round_(y + adj + index) <= 12 && std::floor(x + opp + opp_up * index) >= 0 && std::floor(x + opp + opp_up * index) <= 12) {
                     if (map[static_cast<int>(round_(y + adj + index))][static_cast<int>(std::floor(x + opp + opp_up * index))] != 0) {
                         return_1 = std::make_pair(x + opp + opp_up * index, std::floor(y + adj + index));
                         break;
@@ -366,7 +374,7 @@ std::pair<double, double> Collision::collision_270_360(int map[13][13], double a
         return return_2;
     }
 
-std::pair<double, double> Collision::collision_180_270(int map[13][13], double angle) const {
+std::pair<double, double> Collision::collision_180_270(int** map, double angle) const {
     double x = player.getX();
     double y = player.getY();
     
