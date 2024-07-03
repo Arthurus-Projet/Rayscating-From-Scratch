@@ -113,15 +113,18 @@ std::vector<double> NeuralNetwork::forward_propagation(std::vector<double> input
     return calculate_second_layer_values();
 }
 
+/*
+
 int main() {
-    NeuralNetwork nn(3, 4, 2);
+    NeuralNetwork nn = NeuralNetwork(3, 4, 2);
 
     nn.print_weights();
     nn.print_second_layer_weights();
 
     std::vector<double> input_values = {1.0, 0.5, -1.5};
     std::vector<double> output = nn.forward_propagation(input_values);
-
+    //nn.first_layer_weights().size();
+    nn.second_layer_values;
     std::cout << "Output values:" << std::endl;
     for (int val : output) {
         std::cout << val << " ";
@@ -129,4 +132,4 @@ int main() {
     std::cout << std::endl;
 
     return 0;
-}
+}*/
