@@ -2,12 +2,32 @@
 #include <iostream>
 #include <algorithm> 
 #include <cmath>
+#include <cstdlib>
 #include "Headers/MathFunctions.h"
 #include "Headers/Collision.h"
 #include "Headers/Player.h"
 
+double playerInTheFieldOfVision(double hyp, Collision collision, double posSoliderX, double posSoliderY) {
+    for (int rayon = collision.player.getAngle() + 50; rayon >= collision.player.getAngle() - 30; rayon--) {
+            int newRayon = modulo(rayon, 360);
+
+            double pos_y = collision.player.getY() - hyp * std::sin(degToRad(newRayon));
+            double pos_x = collision.player.getX() + hyp * std::cos(degToRad(newRayon));
+           
+            if (std::abs(pos_x - posSoliderX) < 0.1 && std::abs(pos_y - posSoliderY) < 0.1)
+                return rayon;
+        }
+        return 100;
+    }
+
+
 
 int main() {
+    double windowHeight = 800;
+    double windowWidth = 496;
+
+    double playerX2 = 1.3;
+    double playerY2 = 1.353;
 
     double playerX = 4.4;
     double playerY = 6.2;
@@ -15,9 +35,8 @@ int main() {
     int r;
     double rayon;
     double size = 4;
-    double windowHeight = 800;
-    double windowWidth = 496;
-    double speed = 0.01;
+
+    double speed = 0.0025;
     int reference_angle = 90;
     double health = 10;
     bool bool_line = true;
@@ -27,8 +46,14 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML Raycasting");
 
     sf::Texture texture;
-    if (!texture.loadFromFile("ressources/bric.png")) {
+    if (!texture.loadFromFile("ressources/textures/bric.png")) {
         std::cerr << "Erreur lors du chargement de l'image" << std::endl;
+        return -1;
+    }
+
+    sf::Texture textureSoldier;
+    if (!textureSoldier.loadFromFile("ressources/sprites/soldier/0.png")) {
+        // Afficher un message d'erreur si le fichier ne peut pas être chargé
         return -1;
     }
 
@@ -88,24 +113,32 @@ int main() {
         float speed = 5.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
             // to move forward
-            collision.player.setX(collision.player.getX() + collision.player.getSpeed() * std::cos(degToRad(collision.player.getAngle())));
-            collision.player.setY(collision.player.getY() - collision.player.getSpeed() * std::sin(degToRad(collision.player.getAngle())));
+            double pos_y = collision.player.getY() - (collision.player.getSpeed() * 32) * std::sin(degToRad(collision.player.getAngle()));
+            double pos_x = collision.player.getX() + (collision.player.getSpeed() * 32) * std::cos(degToRad(collision.player.getAngle()));
+            if (map[static_cast<int>(pos_y)][static_cast<int>(pos_x)] == 0)
+            {
+                collision.player.setX(collision.player.getX() + collision.player.getSpeed() * std::cos(degToRad(collision.player.getAngle())));
+                collision.player.setY(collision.player.getY() - collision.player.getSpeed() * std::sin(degToRad(collision.player.getAngle())));
+            }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             // to move backwards
+            double pos_y = collision.player.getY() + (collision.player.getSpeed() * 32) * std::sin(degToRad(collision.player.getAngle()));
+            double pos_x = collision.player.getX() - (collision.player.getSpeed() * 32) * std::cos(degToRad(collision.player.getAngle()));
+            if (map[static_cast<int>(pos_y)][static_cast<int>(pos_x)] == 0) {
             collision.player.setX(collision.player.getX() - collision.player.getSpeed() * std::cos(degToRad(collision.player.getAngle())));
             collision.player.setY(collision.player.getY() + collision.player.getSpeed() * std::sin(degToRad(collision.player.getAngle())));
+            }
  
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            collision.player.setAngle(collision.player.getAngle() - 1);
-            if (collision.player.getAngle() == -1)
-                collision.player.setAngle(359);
-            
+            collision.player.setAngle(collision.player.getAngle() - 0.1);
+            if (collision.player.getAngle() <= 0)
+                collision.player.setAngle(360);  
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-            collision.player.setAngle(collision.player.getAngle() + 1);
-            if (collision.player.getAngle() == 360)
+            collision.player.setAngle(collision.player.getAngle() + 0.1);
+            if (collision.player.getAngle() >= 360)
                 collision.player.setAngle(0);
         }
 
@@ -194,6 +227,54 @@ int main() {
                 }
                 
             }
+        }
+
+        // Print other player 
+
+        
+        
+
+        double hyp = std::sqrt(std::pow((collision.player.getY() - playerY2), 2) + std::pow((collision.player.getX() - playerX2), 2));
+        double cos_ = std::abs(collision.player.getX() - playerX2) / hyp;
+        double angle_degrees = radToDeg(std::acos(cos_));
+
+        double rayon = playerInTheFieldOfVision(hyp, collision, playerX2, playerY2);
+        if (rayon != 100) {
+            //std::cout << "je suis la 1" << std::endl;
+            if (90 <= rayon && rayon <= 180) 
+                angle_degrees = 90 + 90 - angle_degrees;
+            if (270 <= rayon && rayon <= 360)
+                angle_degrees = 270 + 270 - angle_degrees;
+            if (180 <= rayon && rayon <= 270)
+                angle_degrees = 180 + angle_degrees;
+
+            double angle = collision.player.getAngle() - angle_degrees;
+
+            double difference_with_reference_angle = std::abs(rayon - collision.player.getAngle());
+
+            // Fish eye correction
+            double d = hyp * std::cos(degToRad(difference_with_reference_angle));
+            double distance = (windowHeight * 0.7) / (d + 0.00000001);
+
+            double y_wall = ((windowHeight - distance) / 2);
+
+            double ratio = 110. / 76.;
+
+            double i_ = 61 + ((collision.player.getAngle() - rayon) * 2);
+
+            // Créer un sprite avec la texture chargée
+            sf::Sprite spriteSoldier;
+            spriteSoldier.setTexture(textureSoldier);
+
+            // Redimensionner le sprite
+            double scaleX = distance / ratio; // Mettre à l'échelle à 50% de la largeur originale
+            double scaleY = distance; // Mettre à l'échelle à 50% de la hauteur originale
+            spriteSoldier.setScale(scaleX / 76, scaleY / 110);
+            spriteSoldier.setPosition(i_ * size, y_wall);
+
+            window.draw(spriteSoldier);
+            //std::cout << ratio << "je suis la " << scaleX << " " << scaleY << " " << i_ * size << " " << y_wall << std::endl;
+
         }
 
 

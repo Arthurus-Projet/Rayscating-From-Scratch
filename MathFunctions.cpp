@@ -11,6 +11,11 @@ double degToRad(double degree) {
     }
 }
 
+
+double radToDeg(double radians) {
+    return radians * (180.0 / M_PI);
+}
+
 double round_(double number) {
     return std::floor(number + 0.5);
 }

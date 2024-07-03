@@ -76,7 +76,7 @@ std::pair<double, double> Collision::collision_0_90(int** map, double angle) con
     if (!bool_horizontal) {
         while (true) {
             try {
-                if (static_cast<int>(round(y - adj - static_cast<double>(index) - 1.0)) >= 0 && static_cast<int>(std::floor(x + opp + opp_up * static_cast<double>(index))) >= 0) {
+                if (static_cast<int>(round(y - adj - static_cast<double>(index) - 1.0)) >= 0 && static_cast<int>(std::floor(x + opp + opp_up * static_cast<double>(index))) >= 0 && static_cast<int>(round(y - adj - static_cast<double>(index) - 1.0)) <= 12 && static_cast<int>(std::floor(x + opp + opp_up * static_cast<double>(index))) <= 12) {
                     if (map[static_cast<int>(round(y - adj - static_cast<double>(index) - 1.0))][static_cast<int>(std::floor(x + opp + opp_up * static_cast<double>(index)))] != 0) {
                         double return_x = (x + opp + opp_up * static_cast<double>(index));
                         double return_y = (std::floor(y - adj - static_cast<double>(index)));
@@ -440,7 +440,7 @@ std::pair<double, double> Collision::collision_180_270(int** map, double angle) 
     if (bool_horizontal == false) {
         while (true) {
             try {
-                if (round_(y + adj + index) >= 0 && std::floor(x - opp - opp_up * index) >= 0) {
+                if (round_(y + adj + index) >= 0 && std::floor(x - opp - opp_up * index) >= 0 && round_(y + adj + index) <= 12 && std::floor(x - opp - opp_up * index) <= 12) {
                     if (map[static_cast<int>(round_(y + adj + index))][static_cast<int>(std::floor(x - opp - opp_up * index))] != 0) {
                         return_1 = std::make_pair(x - opp - opp_up * index, std::floor(y + adj + index));
                         break;
