@@ -14,6 +14,46 @@ Controller::Controller(Player player)
     : player(player) {}
 
 
+std::pair<double, double> Controller::positionWallToPlayer(double rayon, int** map) {
+    if (0.0 <= rayon == true && rayon < 90.0 == true) 
+        return controller_0_90(map, rayon);
+
+    if (90 <= rayon == true && rayon < 180 == true) 
+        return controller_90_180(map, rayon);
+
+    if (270 < rayon == true && rayon < 360 == true) 
+        return controller_270_360(map, rayon); 
+
+    return controller_180_270(map, rayon);   
+}
+
+double Controller::playerInTheFieldOfVision(double hyp, double posSoliderX, double posSoliderY) {
+    for (int rayon = player.getAngle() + 50; rayon >= player.getAngle() - 30; rayon--) {
+        int newRayon = modulo(rayon, 360);
+
+        double pos_y = player.getY() - hyp * std::sin(degToRad(newRayon));
+        double pos_x = player.getX() + hyp * std::cos(degToRad(newRayon));
+        
+        if (std::abs(pos_x - posSoliderX) < 0.1 && std::abs(pos_y - posSoliderY) < 0.1)
+            return rayon;
+        }
+    return 100;
+    }
+
+double Controller::angleToEnemy(double hyp, double posSoliderX, double posSoliderY, int** map) {
+    double rayon = playerInTheFieldOfVision(hyp, posSoliderX, posSoliderY);
+    if (rayon != 100) {
+        std::pair<double, double> pos = positionWallToPlayer(rayon, map);
+        double hypWallPlayer = std::sqrt(std::abs(std::pow(std::abs(player.getX() - pos.first), 2) - std::pow(std::abs(player.getY() - pos.second), 2)));
+        //std::cout << controller.player.getX() << " " << controller.player.getY() << std::endl;
+        //std::cout << pos.first << " "<< pos.second << " " << hypWallPlayer << " " << hyp << std::endl;
+        if (hypWallPlayer > hyp)
+            return player.getAngle() - rayon;
+        }
+    return 400.;
+    }
+
+
 std::pair<double, double> Controller::controller_0_90(int** map, double angle) const {
     double x = player.getX();
     double y = player.getY();

@@ -9,44 +9,6 @@
 #include "Headers/Player.h"
 
 
-std::pair<double, double> positionWallToPlayer(double rayon, Controller controller, int** map) {
-    if (0.0 <= rayon == true && rayon < 90.0 == true) 
-        return controller.controller_0_90(map, rayon);
-
-    if (90 <= rayon == true && rayon < 180 == true) 
-        return controller.controller_90_180(map, rayon);
-
-    if (270 < rayon == true && rayon < 360 == true) 
-        return controller.controller_270_360(map, rayon); 
-
-    return controller.controller_180_270(map, rayon);   
-}
-
-double playerInTheFieldOfVision(double hyp, Controller controller, double posSoliderX, double posSoliderY) {
-    for (int rayon = controller.player.getAngle() + 50; rayon >= controller.player.getAngle() - 30; rayon--) {
-        int newRayon = modulo(rayon, 360);
-
-        double pos_y = controller.player.getY() - hyp * std::sin(degToRad(newRayon));
-        double pos_x = controller.player.getX() + hyp * std::cos(degToRad(newRayon));
-        
-        if (std::abs(pos_x - posSoliderX) < 0.1 && std::abs(pos_y - posSoliderY) < 0.1)
-            return rayon;
-        }
-    return 100;
-    }
-
-double angleToEnemy(double hyp, Controller controller, double posSoliderX, double posSoliderY, int** map) {
-    double rayon = playerInTheFieldOfVision(hyp, controller, posSoliderX, posSoliderY);
-    if (rayon != 100) {
-        std::pair<double, double> pos = positionWallToPlayer(rayon, controller, map);
-        double hypWallPlayer = std::sqrt(std::abs(std::pow(std::abs(controller.player.getX() - pos.first), 2) - std::pow(std::abs(controller.player.getY() - pos.second), 2)));
-        //std::cout << controller.player.getX() << " " << controller.player.getY() << std::endl;
-        //std::cout << pos.first << " "<< pos.second << " " << hypWallPlayer << " " << hyp << std::endl;
-        if (hypWallPlayer > hyp)
-            return controller.player.getAngle() - rayon;
-        }
-    return 400.;
-    }
 
 int main() {
     double windowHeight = 800;
@@ -191,7 +153,7 @@ int main() {
         sf::Sprite spriteSoldier;
         spriteSoldier.setTexture(textureSoldier);
 
-        double rayonPlayer = playerInTheFieldOfVision(hyp, controller, playerX2, playerY2);
+        double rayonPlayer = controller.playerInTheFieldOfVision(hyp, playerX2, playerY2);
         if (rayonPlayer != 100) {
             //std::cout << "je suis la 1" << std::endl;
             if (90 <= rayonPlayer && rayonPlayer <= 180) 
@@ -239,7 +201,7 @@ int main() {
             
 
                 // function return pos
-                std::pair<double, double> pos = positionWallToPlayer(rayon, controller, map);
+                std::pair<double, double> pos = controller.positionWallToPlayer(rayon, map);
 
                 double sideX = controller.player.getX() - pos.first;
                 double sideY = controller.player.getY() - pos.second;
@@ -315,7 +277,7 @@ int main() {
 
         
 
-        std::cout  << angleToEnemy(hyp, controller, playerX2, playerY2, map) << std::endl;
+        std::cout  << controller.angleToEnemy(hyp, playerX2, playerY2, map) << std::endl;
         window.display();
     }
 
