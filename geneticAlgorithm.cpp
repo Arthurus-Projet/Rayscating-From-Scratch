@@ -104,7 +104,8 @@ void AlgorithmeGenetique::mutation(int prob, int prob_0, int prob_inverse, float
     }
 }
 
-int main() {
+/*int main() {
 
     return 0;
 }
+*/

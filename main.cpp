@@ -3,24 +3,50 @@
 #include <algorithm> 
 #include <cmath>
 #include <cstdlib>
+#include <vector>
 #include "Headers/MathFunctions.h"
-#include "Headers/Collision.h"
+#include "Headers/Controller.h"
 #include "Headers/Player.h"
 
-double playerInTheFieldOfVision(double hyp, Collision collision, double posSoliderX, double posSoliderY) {
-    for (int rayon = collision.player.getAngle() + 50; rayon >= collision.player.getAngle() - 30; rayon--) {
-            int newRayon = modulo(rayon, 360);
 
-            double pos_y = collision.player.getY() - hyp * std::sin(degToRad(newRayon));
-            double pos_x = collision.player.getX() + hyp * std::cos(degToRad(newRayon));
-           
-            if (std::abs(pos_x - posSoliderX) < 0.1 && std::abs(pos_y - posSoliderY) < 0.1)
-                return rayon;
+std::pair<double, double> positionWallToPlayer(double rayon, Controller controller, int** map) {
+    if (0.0 <= rayon == true && rayon < 90.0 == true) 
+        return controller.controller_0_90(map, rayon);
+
+    if (90 <= rayon == true && rayon < 180 == true) 
+        return controller.controller_90_180(map, rayon);
+
+    if (270 < rayon == true && rayon < 360 == true) 
+        return controller.controller_270_360(map, rayon); 
+
+    return controller.controller_180_270(map, rayon);   
+}
+
+double playerInTheFieldOfVision(double hyp, Controller controller, double posSoliderX, double posSoliderY) {
+    for (int rayon = controller.player.getAngle() + 50; rayon >= controller.player.getAngle() - 30; rayon--) {
+        int newRayon = modulo(rayon, 360);
+
+        double pos_y = controller.player.getY() - hyp * std::sin(degToRad(newRayon));
+        double pos_x = controller.player.getX() + hyp * std::cos(degToRad(newRayon));
+        
+        if (std::abs(pos_x - posSoliderX) < 0.1 && std::abs(pos_y - posSoliderY) < 0.1)
+            return rayon;
         }
-        return 100;
+    return 100;
     }
 
-
+double angleToEnemy(double hyp, Controller controller, double posSoliderX, double posSoliderY, int** map) {
+    double rayon = playerInTheFieldOfVision(hyp, controller, posSoliderX, posSoliderY);
+    if (rayon != 100) {
+        std::pair<double, double> pos = positionWallToPlayer(rayon, controller, map);
+        double hypWallPlayer = std::sqrt(std::abs(std::pow(std::abs(controller.player.getX() - pos.first), 2) - std::pow(std::abs(controller.player.getY() - pos.second), 2)));
+        //std::cout << controller.player.getX() << " " << controller.player.getY() << std::endl;
+        //std::cout << pos.first << " "<< pos.second << " " << hypWallPlayer << " " << hyp << std::endl;
+        if (hypWallPlayer > hyp)
+            return controller.player.getAngle() - rayon;
+        }
+    return 400.;
+    }
 
 int main() {
     double windowHeight = 800;
@@ -41,7 +67,7 @@ int main() {
     double health = 10;
     bool bool_line = true;
     Player player = Player(playerX, playerY, speed, reference_angle, health);
-    Collision collision = Collision(player);
+    Controller controller = Controller(player);
     
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML Raycasting");
 
@@ -113,33 +139,33 @@ int main() {
         float speed = 5.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
             // to move forward
-            double pos_y = collision.player.getY() - (collision.player.getSpeed() * 32) * std::sin(degToRad(collision.player.getAngle()));
-            double pos_x = collision.player.getX() + (collision.player.getSpeed() * 32) * std::cos(degToRad(collision.player.getAngle()));
+            double pos_y = controller.player.getY() - (controller.player.getSpeed() * 32) * std::sin(degToRad(controller.player.getAngle()));
+            double pos_x = controller.player.getX() + (controller.player.getSpeed() * 32) * std::cos(degToRad(controller.player.getAngle()));
             if (map[static_cast<int>(pos_y)][static_cast<int>(pos_x)] == 0)
             {
-                collision.player.setX(collision.player.getX() + collision.player.getSpeed() * std::cos(degToRad(collision.player.getAngle())));
-                collision.player.setY(collision.player.getY() - collision.player.getSpeed() * std::sin(degToRad(collision.player.getAngle())));
+                controller.player.setX(controller.player.getX() + controller.player.getSpeed() * std::cos(degToRad(controller.player.getAngle())));
+                controller.player.setY(controller.player.getY() - controller.player.getSpeed() * std::sin(degToRad(controller.player.getAngle())));
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             // to move backwards
-            double pos_y = collision.player.getY() + (collision.player.getSpeed() * 32) * std::sin(degToRad(collision.player.getAngle()));
-            double pos_x = collision.player.getX() - (collision.player.getSpeed() * 32) * std::cos(degToRad(collision.player.getAngle()));
+            double pos_y = controller.player.getY() + (controller.player.getSpeed() * 32) * std::sin(degToRad(controller.player.getAngle()));
+            double pos_x = controller.player.getX() - (controller.player.getSpeed() * 32) * std::cos(degToRad(controller.player.getAngle()));
             if (map[static_cast<int>(pos_y)][static_cast<int>(pos_x)] == 0) {
-            collision.player.setX(collision.player.getX() - collision.player.getSpeed() * std::cos(degToRad(collision.player.getAngle())));
-            collision.player.setY(collision.player.getY() + collision.player.getSpeed() * std::sin(degToRad(collision.player.getAngle())));
+            controller.player.setX(controller.player.getX() - controller.player.getSpeed() * std::cos(degToRad(controller.player.getAngle())));
+            controller.player.setY(controller.player.getY() + controller.player.getSpeed() * std::sin(degToRad(controller.player.getAngle())));
             }
  
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            collision.player.setAngle(collision.player.getAngle() - 0.1);
-            if (collision.player.getAngle() <= 0)
-                collision.player.setAngle(360);  
+            controller.player.setAngle(controller.player.getAngle() - 0.1);
+            if (controller.player.getAngle() <= 0)
+                controller.player.setAngle(360);  
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-            collision.player.setAngle(collision.player.getAngle() + 0.1);
-            if (collision.player.getAngle() >= 360)
-                collision.player.setAngle(0);
+            controller.player.setAngle(controller.player.getAngle() + 0.1);
+            if (controller.player.getAngle() >= 360)
+                controller.player.setAngle(0);
         }
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
@@ -155,36 +181,71 @@ int main() {
         window.draw(redRectangle);
         
         int i = -1;
+
+        // other player view
+
+        double hyp = std::sqrt(std::pow((controller.player.getY() - playerY2), 2) + std::pow((controller.player.getX() - playerX2), 2));
+        double cos_ = std::abs(controller.player.getX() - playerX2) / hyp;
+        double angle_degrees = radToDeg(std::acos(cos_));
+        double distancePlayer = 0.;
+        sf::Sprite spriteSoldier;
+        spriteSoldier.setTexture(textureSoldier);
+
+        double rayonPlayer = playerInTheFieldOfVision(hyp, controller, playerX2, playerY2);
+        if (rayonPlayer != 100) {
+            //std::cout << "je suis la 1" << std::endl;
+            if (90 <= rayonPlayer && rayonPlayer <= 180) 
+                angle_degrees = 90 + 90 - angle_degrees;
+            if (270 <= rayonPlayer && rayonPlayer <= 360)
+                angle_degrees = 270 + 270 - angle_degrees;
+            if (180 <= rayonPlayer && rayonPlayer <= 270)
+                angle_degrees = 180 + angle_degrees;
+
+            double angle = controller.player.getAngle() - angle_degrees;
+
+            double difference_with_reference_angle = std::abs(rayon - controller.player.getAngle());
+
+            // Fish eye correction
+            double d = hyp * std::cos(degToRad(difference_with_reference_angle));
+            distancePlayer = (windowHeight * 0.7) / (d + 0.00000001);
+
+            double y_wall = ((windowHeight - distancePlayer) / 2);
+            double ratio = 110. / 76.;
+            double i_ = 61 + ((controller.player.getAngle() - rayonPlayer) * 2);
+
+            // Créer un sprite avec la texture chargée
+            
+    
+            // Redimensionner le sprite
+            double scaleX = distancePlayer / ratio; // Mettre à l'échelle à 50% de la largeur originale
+            double scaleY = distancePlayer; // Mettre à l'échelle à 50% de la hauteur originale
+            spriteSoldier.setScale(scaleX / 76, scaleY / 110);
+            spriteSoldier.setPosition(i_ * size, y_wall);
+
+            window.draw(spriteSoldier);
+           
+        }
+
+        //end other player view
+
         
-        for(r = collision.player.getAngle() + 30.0; r >= collision.player.getAngle() -31.0; r-= 1.0) {
+        std::vector<sf::Sprite> spriteList;
+        std::vector<double> distanceList;
+        for(r = controller.player.getAngle() + 30.0; r >= controller.player.getAngle() -31.0; r-= 1.0) {
             for (double y = 0.5; y >= 0; y-=0.5){
                 i++;
 
                 rayon = modulo(r + y, 360);
-                std::pair<double, double> pos;
-                
+            
 
-                if (0.0 <= rayon == true && rayon < 90.0 == true) {
-                    pos = collision.collision_0_90(map, rayon);
-                }
+                // function return pos
+                std::pair<double, double> pos = positionWallToPlayer(rayon, controller, map);
 
-                if (90 <= rayon == true && rayon < 180 == true) {
-                    pos = collision.collision_90_180(map, rayon);
-                }
-
-                if (270 < rayon == true && rayon < 360 == true) {
-                    pos = collision.collision_270_360(map, rayon);
-                }
-
-                if (180 <= rayon == true && rayon <= 270 == true) {
-                    pos = collision.collision_180_270(map, rayon);
-                }
-
-                double sideX = collision.player.getX() - pos.first;
-                double sideY = collision.player.getY() - pos.second;
+                double sideX = controller.player.getX() - pos.first;
+                double sideY = controller.player.getY() - pos.second;
                 double hyp = std::sqrt(sideX * sideX + sideY * sideY);
 
-                double differenceWithPlayer = std::abs(rayon - collision.player.getAngle());
+                double differenceWithPlayer = std::abs(rayon - controller.player.getAngle());
 
                 // fish eye correction
                 double d = hyp * std::cos(degToRad(differenceWithPlayer));
@@ -216,7 +277,9 @@ int main() {
                 sprite.setScale(1, scaleY);
                 sprite.setPosition(i * size, yWall);
 
-                window.draw(sprite);
+                //window.draw(sprite);
+                spriteList.push_back(sprite);
+                distanceList.push_back(distance);
 
                 if (bool_line) {
                     sf::RectangleShape rectangle;
@@ -229,55 +292,30 @@ int main() {
             }
         }
 
-        // Print other player 
-
-        
         
 
-        double hyp = std::sqrt(std::pow((collision.player.getY() - playerY2), 2) + std::pow((collision.player.getX() - playerX2), 2));
-        double cos_ = std::abs(collision.player.getX() - playerX2) / hyp;
-        double angle_degrees = radToDeg(std::acos(cos_));
+        for (int i = 0; i < spriteList.size(); ++i) {
+            if (distanceList[i] < distancePlayer)
+                window.draw(spriteList[i]);
+        }
 
-        double rayon = playerInTheFieldOfVision(hyp, collision, playerX2, playerY2);
-        if (rayon != 100) {
-            //std::cout << "je suis la 1" << std::endl;
-            if (90 <= rayon && rayon <= 180) 
-                angle_degrees = 90 + 90 - angle_degrees;
-            if (270 <= rayon && rayon <= 360)
-                angle_degrees = 270 + 270 - angle_degrees;
-            if (180 <= rayon && rayon <= 270)
-                angle_degrees = 180 + angle_degrees;
-
-            double angle = collision.player.getAngle() - angle_degrees;
-
-            double difference_with_reference_angle = std::abs(rayon - collision.player.getAngle());
-
-            // Fish eye correction
-            double d = hyp * std::cos(degToRad(difference_with_reference_angle));
-            double distance = (windowHeight * 0.7) / (d + 0.00000001);
-
-            double y_wall = ((windowHeight - distance) / 2);
-
-            double ratio = 110. / 76.;
-
-            double i_ = 61 + ((collision.player.getAngle() - rayon) * 2);
-
-            // Créer un sprite avec la texture chargée
-            sf::Sprite spriteSoldier;
-            spriteSoldier.setTexture(textureSoldier);
-
-            // Redimensionner le sprite
-            double scaleX = distance / ratio; // Mettre à l'échelle à 50% de la largeur originale
-            double scaleY = distance; // Mettre à l'échelle à 50% de la hauteur originale
-            spriteSoldier.setScale(scaleX / 76, scaleY / 110);
-            spriteSoldier.setPosition(i_ * size, y_wall);
-
+        if (rayonPlayer != 100)
             window.draw(spriteSoldier);
-            //std::cout << ratio << "je suis la " << scaleX << " " << scaleY << " " << i_ * size << " " << y_wall << std::endl;
 
+        for (int i = 0; i < spriteList.size(); ++i) {
+            if (distanceList[i] > distancePlayer)
+                window.draw(spriteList[i]);
         }
 
 
+        
+
+        
+        
+
+        
+
+        std::cout  << angleToEnemy(hyp, controller, playerX2, playerY2, map) << std::endl;
         window.display();
     }
 
