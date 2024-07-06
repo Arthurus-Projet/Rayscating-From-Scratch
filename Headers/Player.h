@@ -14,6 +14,12 @@ public:
 
     Player(double x, double y, double speed, double angle, int health);
 
+    bool moveForward(int** map);
+    bool moveBack(int **map);
+    void newAngle(double value);
+
+    bool shoot(double XOtherPlayer, double YOtherPlayer, double hyp_reference_angle);
+
     double getX() const;
     double getY() const;
     double getSpeed() const;

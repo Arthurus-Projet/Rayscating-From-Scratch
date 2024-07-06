@@ -4,13 +4,18 @@
 #include <cmath>
 #include <cstdlib>
 #include <vector>
+
 #include "Headers/MathFunctions.h"
 #include "Headers/Controller.h"
 #include "Headers/Player.h"
 #include "Headers/variables.h"
 
 
+
 int main() {
+
+    bool otherPlayerAlive = true;
+    double hyp_reference_angle;
 
     std::cout << playerX2 << " " << playerY2 << std::endl;
 
@@ -42,10 +47,6 @@ int main() {
     redRectangle.setFillColor(sf::Color(97, 9, 0)); // red
     redRectangle.setPosition(0.f, 0.f); 
 
-
-
-
-
     // Memory allocation for dynamic arrays
     int rows = 13;
     int cols = 13;
@@ -62,6 +63,12 @@ int main() {
         }
     }
 
+
+
+
+
+    
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -71,43 +78,27 @@ int main() {
 
         
         float speed = 5.0f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
-            // to move forward
-            double pos_y = controller.player.getY() - (controller.player.getSpeed() * 32) * std::sin(degToRad(controller.player.getAngle()));
-            double pos_x = controller.player.getX() + (controller.player.getSpeed() * 32) * std::cos(degToRad(controller.player.getAngle()));
-            if (map[static_cast<int>(pos_y)][static_cast<int>(pos_x)] == 0)
-            {
-                controller.player.setX(controller.player.getX() + controller.player.getSpeed() * std::cos(degToRad(controller.player.getAngle())));
-                controller.player.setY(controller.player.getY() - controller.player.getSpeed() * std::sin(degToRad(controller.player.getAngle())));
-            }
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-            // to move backwards
-            double pos_y = controller.player.getY() + (controller.player.getSpeed() * 32) * std::sin(degToRad(controller.player.getAngle()));
-            double pos_x = controller.player.getX() - (controller.player.getSpeed() * 32) * std::cos(degToRad(controller.player.getAngle()));
-            if (map[static_cast<int>(pos_y)][static_cast<int>(pos_x)] == 0) {
-            controller.player.setX(controller.player.getX() - controller.player.getSpeed() * std::cos(degToRad(controller.player.getAngle())));
-            controller.player.setY(controller.player.getY() + controller.player.getSpeed() * std::sin(degToRad(controller.player.getAngle())));
-            }
- 
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            controller.player.setAngle(controller.player.getAngle() - 0.1);
-            if (controller.player.getAngle() <= 0)
-                controller.player.setAngle(360);  
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-            controller.player.setAngle(controller.player.getAngle() + 0.1);
-            if (controller.player.getAngle() >= 360)
-                controller.player.setAngle(0);
-        }
-
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) 
+            controller.player.moveForward(map);
+        
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) 
+            controller.player.moveBack(map);
+        
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
+           controller.player.newAngle(-0.1);
+        
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) 
+            controller.player.newAngle(0.1);
+        
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
             bool_line = true;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) {
             bool_line = false;
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) 
+            if (controller.player.shoot(playerX2, playerY2, hyp_reference_angle))
+                otherPlayerAlive = false;
 
         window.clear();
 
@@ -118,48 +109,50 @@ int main() {
 
         // other player view
 
-        double hyp = std::sqrt(std::pow((controller.player.getY() - playerY2), 2) + std::pow((controller.player.getX() - playerX2), 2));
-        double cos_ = std::abs(controller.player.getX() - playerX2) / hyp;
-        double angle_degrees = radToDeg(std::acos(cos_));
-        double distancePlayer = 0.;
-        sf::Sprite spriteSoldier;
-        spriteSoldier.setTexture(textureSoldier);
+        
+            double hyp = std::sqrt(std::pow((controller.player.getY() - playerY2), 2) + std::pow((controller.player.getX() - playerX2), 2));
+            double cos_ = std::abs(controller.player.getX() - playerX2) / hyp;
+            double angle_degrees = radToDeg(std::acos(cos_));
+            double distancePlayer = 0.;
+            sf::Sprite spriteSoldier;
+            spriteSoldier.setTexture(textureSoldier);
 
-        double rayonPlayer = controller.playerInTheFieldOfVision(hyp, playerX2, playerY2);
-        if (rayonPlayer != 100) {
-            //std::cout << "je suis la 1" << std::endl;
-            if (90 <= rayonPlayer && rayonPlayer <= 180) 
-                angle_degrees = 90 + 90 - angle_degrees;
-            if (270 <= rayonPlayer && rayonPlayer <= 360)
-                angle_degrees = 270 + 270 - angle_degrees;
-            if (180 <= rayonPlayer && rayonPlayer <= 270)
-                angle_degrees = 180 + angle_degrees;
+            double rayonPlayer = controller.playerInTheFieldOfVision(hyp, playerX2, playerY2);
+            if (rayonPlayer != 100) {
+                //std::cout << "je suis la 1" << std::endl;
+                if (90 <= rayonPlayer && rayonPlayer <= 180) 
+                    angle_degrees = 90 + 90 - angle_degrees;
+                if (270 <= rayonPlayer && rayonPlayer <= 360)
+                    angle_degrees = 270 + 270 - angle_degrees;
+                if (180 <= rayonPlayer && rayonPlayer <= 270)
+                    angle_degrees = 180 + angle_degrees;
 
-            double angle = controller.player.getAngle() - angle_degrees;
+                double angle = controller.player.getAngle() - angle_degrees;
 
-            double difference_with_reference_angle = std::abs(rayonPlayer - controller.player.getAngle());
+                double difference_with_reference_angle = std::abs(rayonPlayer - controller.player.getAngle());
 
-            // Fish eye correction
-            double d = hyp * std::cos(degToRad(difference_with_reference_angle));
-            distancePlayer = (windowHeight * 0.7) / (d + 0.00000001);
+                // Fish eye correction
+                double d = hyp * std::cos(degToRad(difference_with_reference_angle));
+                distancePlayer = (windowHeight * 0.7) / (d + 0.00000001);
 
-            double y_wall = ((windowHeight - distancePlayer) / 2);
-            double ratio = 110. / 76.;
-            double i_ = 61 + ((controller.player.getAngle() - rayonPlayer) * 2);
+                double y_wall = ((windowHeight - distancePlayer) / 2);
+                double ratio = 110. / 76.;
+                double i_ = 61 + ((controller.player.getAngle() - rayonPlayer) * 2);
 
-            // Créer un sprite avec la texture chargée
+                // Créer un sprite avec la texture chargée
+                
+        
+                // Redimensionner le sprite
+                double scaleX = distancePlayer / ratio; // Mettre à l'échelle à 50% de la largeur originale
+                double scaleY = distancePlayer; // Mettre à l'échelle à 50% de la hauteur originale
+                spriteSoldier.setScale(scaleX / 76, scaleY / 110);
+                spriteSoldier.setPosition(i_ * size, y_wall);
+                
+                
             
-    
-            // Redimensionner le sprite
-            double scaleX = distancePlayer / ratio; // Mettre à l'échelle à 50% de la largeur originale
-            double scaleY = distancePlayer; // Mettre à l'échelle à 50% de la hauteur originale
-            spriteSoldier.setScale(scaleX / 76, scaleY / 110);
-            spriteSoldier.setPosition(i_ * size, y_wall);
-
-            window.draw(spriteSoldier);
-           
-        }
-
+            }
+        
+        std::cout << otherPlayerAlive << std::endl;
         //end other player view
 
         
@@ -178,6 +171,9 @@ int main() {
                 double sideX = controller.player.getX() - pos.first;
                 double sideY = controller.player.getY() - pos.second;
                 double hyp = std::sqrt(sideX * sideX + sideY * sideY);
+
+                if (rayon == controller.player.getAngle())
+                    hyp_reference_angle = hyp;
 
                 double differenceWithPlayer = std::abs(rayon - controller.player.getAngle());
 
@@ -233,7 +229,7 @@ int main() {
                 window.draw(spriteList[i]);
         }
 
-        if (rayonPlayer != 100)
+        if (rayonPlayer != 100 && otherPlayerAlive)
             window.draw(spriteSoldier);
 
         for (int i = 0; i < spriteList.size(); ++i) {
