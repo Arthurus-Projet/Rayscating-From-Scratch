@@ -28,7 +28,7 @@ std::pair<double, double> Controller::positionWallToPlayer(double rayon, int** m
 }
 
 double Controller::playerInTheFieldOfVision(double hyp, double posSoliderX, double posSoliderY) {
-    for (int rayon = player.getAngle() + 50; rayon >= player.getAngle() - 30; rayon--) {
+    for (int rayon = player.getAngle() + 60; rayon >= player.getAngle() - 31; --rayon) {
         int newRayon = modulo(rayon, 360);
 
         double pos_y = player.getY() - hyp * std::sin(degToRad(newRayon));
@@ -39,6 +39,7 @@ double Controller::playerInTheFieldOfVision(double hyp, double posSoliderX, doub
         }
     return 100;
     }
+
 
 double Controller::angleToEnemy(double hyp, double posSoliderX, double posSoliderY, int** map) {
     double rayon = playerInTheFieldOfVision(hyp, posSoliderX, posSoliderY);

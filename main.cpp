@@ -7,27 +7,13 @@
 #include "Headers/MathFunctions.h"
 #include "Headers/Controller.h"
 #include "Headers/Player.h"
-
+#include "Headers/variables.h"
 
 
 int main() {
-    double windowHeight = 800;
-    double windowWidth = 496;
 
-    double playerX2 = 1.3;
-    double playerY2 = 1.353;
+    std::cout << playerX2 << " " << playerY2 << std::endl;
 
-    double playerX = 4.4;
-    double playerY = 6.2;
-    int referenceAngle = 0;
-    int r;
-    double rayon;
-    double size = 4;
-
-    double speed = 0.0025;
-    int reference_angle = 90;
-    double health = 10;
-    bool bool_line = true;
     Player player = Player(playerX, playerY, speed, reference_angle, health);
     Controller controller = Controller(player);
     
@@ -58,23 +44,9 @@ int main() {
 
 
 
-    int initial_map[13][13] = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 1},
-        {1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-    };
 
-    // Allocation de mémoire pour le tableau dynamique
+
+    // Memory allocation for dynamic arrays
     int rows = 13;
     int cols = 13;
 
@@ -83,13 +55,13 @@ int main() {
         map[i] = new int[cols];
     }
 
-    // Copie des valeurs du tableau statique vers le tableau dynamique
+    // Copy values from the static table to the dynamic arrays
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             map[i][j] = initial_map[i][j];
         }
     }
-    
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -165,7 +137,7 @@ int main() {
 
             double angle = controller.player.getAngle() - angle_degrees;
 
-            double difference_with_reference_angle = std::abs(rayon - controller.player.getAngle());
+            double difference_with_reference_angle = std::abs(rayonPlayer - controller.player.getAngle());
 
             // Fish eye correction
             double d = hyp * std::cos(degToRad(difference_with_reference_angle));
@@ -193,11 +165,11 @@ int main() {
         
         std::vector<sf::Sprite> spriteList;
         std::vector<double> distanceList;
-        for(r = controller.player.getAngle() + 30.0; r >= controller.player.getAngle() -31.0; r-= 1.0) {
+        for(int r = controller.player.getAngle() + 30.0; r >= controller.player.getAngle() -31.0; r-= 1.0) {
             for (double y = 0.5; y >= 0; y-=0.5){
                 i++;
 
-                rayon = modulo(r + y, 360);
+                double rayon = modulo(r + y, 360);
             
 
                 // function return pos
@@ -277,7 +249,7 @@ int main() {
 
         
 
-        std::cout  << controller.angleToEnemy(hyp, playerX2, playerY2, map) << std::endl;
+        //std::cout  << controller.angleToEnemy(hyp, playerX2, playerY2, map) << playerY2 << "  map :"<<  lenMap<< std::endl;
         window.display();
     }
 
