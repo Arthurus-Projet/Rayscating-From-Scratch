@@ -1,0 +1,2 @@
+echo *.dat > .gitignore
+echo *.dll >> .gitignore
