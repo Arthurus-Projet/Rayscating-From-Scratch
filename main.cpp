@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <vector>
@@ -21,7 +21,7 @@ int main() {
 
     Player player = Player(playerX, playerY, speed, referenceAngle, health);
     Controller controller = Controller(player);
-    
+
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "SFML Raycasting");
     window.setFramerateLimit(60);
 
@@ -42,24 +42,22 @@ int main() {
 
     sf::RectangleShape greyRectangle(rectangleSize);
     greyRectangle.setFillColor(sf::Color(113, 113, 113)); // grey
-    greyRectangle.setPosition(0.f, windowHeight / 2.f); 
+    greyRectangle.setPosition(0.f, windowHeight / 2.f);
 
     sf::RectangleShape redRectangle(rectangleSize);
     redRectangle.setFillColor(sf::Color(97, 9, 0)); // red
-    redRectangle.setPosition(0.f, 0.f); 
+    redRectangle.setPosition(0.f, 0.f);
 
     // Memory allocation for dynamic arrays
-    int rows = 13;
-    int cols = 13;
-
+    
     int** map = new int*[rows];
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < rows; ++i) {
         map[i] = new int[cols];
     }
 
     // Copy values from the static table to the dynamic arrays
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
             map[i][j] = initial_map[i][j];
         }
     }
@@ -68,7 +66,7 @@ int main() {
 
 
 
-    
+
 
     while (window.isOpen()) {
         sf::Event event;
@@ -77,28 +75,28 @@ int main() {
                 window.close();
         }
 
-        
+
         float speed = 5.0f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
             controller.player.moveForward(map);
-        
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) 
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             controller.player.moveBack(map);
-        
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) 
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
            controller.player.newAngle(-2);
-        
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) 
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
             controller.player.newAngle(2);
-        
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
             bool_line = true;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) {
             bool_line = false;
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) 
-            
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+
             if (controller.player.shoot(playerX2, playerY2, hyp_reference_angle))
                 otherPlayerAlive = false;
 
@@ -106,7 +104,7 @@ int main() {
 
         window.draw(greyRectangle);
         window.draw(redRectangle);
-        
+
         int i = -1;
 
         // other player view
@@ -121,7 +119,7 @@ int main() {
         double rayonPlayer = controller.playerInTheFieldOfVision(hyp, playerX2, playerY2);
         if (rayonPlayer != 100) {
             //std::cout << "je suis la 1" << std::endl;
-            if (90 <= rayonPlayer && rayonPlayer <= 180) 
+            if (90 <= rayonPlayer && rayonPlayer <= 180)
                 angle_degrees = 90 + 90 - angle_degrees;
             if (270 <= rayonPlayer && rayonPlayer <= 360)
                 angle_degrees = 270 + 270 - angle_degrees;
@@ -141,30 +139,30 @@ int main() {
             double i_ = 61 + ((controller.player.getAngle() - rayonPlayer) * 2);
 
             // Créer un sprite avec la texture chargée
-            
-    
+
+
             // Redimensionner le sprite
             double scaleX = distancePlayer / ratio; // Mettre à l'échelle à 50% de la largeur originale
             double scaleY = distancePlayer; // Mettre à l'échelle à 50% de la hauteur originale
             spriteSoldier.setScale(scaleX / 76, scaleY / 110);
             spriteSoldier.setPosition(i_ * size, y_wall);
-            
-            
-        
+
+
+
         }
-        
+
         //std::cout << otherPlayerAlive << std::endl;
         //end other player view
 
-        
+
         std::vector<sf::Sprite> spriteList;
         std::vector<double> distanceList;
         for(int r = controller.player.getAngle() + 30.0; r >= controller.player.getAngle() -31.0; r-= 1.0) {
             for (double y = 0.5; y >= 0; y-=0.5){
-                i++;
+                ++i;
 
                 double rayon = modulo(r + y, 360);
-            
+
 
                 // function return pos
                 std::pair<double, double> pos = controller.positionWallToPlayer(rayon, map);
@@ -181,7 +179,7 @@ int main() {
                 // fish eye correction
                 double d = hyp * std::cos(degToRad(differenceWithPlayer));
                 double distance = (windowHeight * 0.7) / (d + 0.0000000001);
-     
+
                 double yWall = ((windowHeight - distance) / 2);
 
                 // Obtenir les dimensions de l'image
@@ -195,14 +193,14 @@ int main() {
                 }
 
                 double startX = rest * textureSize.x;
-              
+
 
                 sf::IntRect textureRect(startX, 0, size, textureSize.y);
 
                 // create spirite
                 sf::Sprite sprite;
                 sprite.setTexture(texture);
-                sprite.setTextureRect(textureRect); 
+                sprite.setTextureRect(textureRect);
 
                 long double scaleY = distance / textureSize.y;
                 sprite.setScale(1, scaleY);
@@ -219,11 +217,11 @@ int main() {
                     rectangle.setFillColor(sf::Color::White);
                     window.draw(rectangle);
                 }
-                
+
             }
         }
 
-        
+
 
         for (int i = 0; i < spriteList.size(); ++i) {
             if (distanceList[i] < distancePlayer)
@@ -239,12 +237,12 @@ int main() {
         }
 
 
-        
-        
-        
-        
 
-        
+
+
+
+
+
 
         //std::cout  << controller.angleToEnemy(hyp, playerX2, playerY2, map) << " angle  : "  <<  controller.player.getAngle() << "  map :"<<  lenMap<< std::endl;
         window.display();

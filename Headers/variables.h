@@ -10,6 +10,9 @@ extern double windowWidth;
 extern double playerX2;
 extern double playerY2;
 
+extern int cols;
+extern int rows;
+
 
 extern double playerX;
 extern double playerY;
